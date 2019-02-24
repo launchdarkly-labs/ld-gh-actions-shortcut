@@ -15,7 +15,10 @@ link_url="$STORY_BASE_URL/$ticket"
 
 new_body=${body/$STORY_LINK_TEXT/$link_url}
 
-new_title="$title"
+# Strip out branch name from the PR title
+new_title="${title/$GITHUB_REF/}"
+
+# Add the clubhouse number to the PR title
 if [[ ! "$new_title" =~ "$ticket" ]]; then
     new_title="[ch${ticket}] $title"
 fi

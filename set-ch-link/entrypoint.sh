@@ -11,7 +11,7 @@ title=$(jq -r .pull_request.title "$GITHUB_EVENT_PATH")
 title=${title//$'\r'/} # Remove /r, which confuses jq in ok.sh
 
 ticket=$(expr "$GITHUB_REF" : '.*ch\([[:digit:]]*\).*')
-link_url="$STORY_LINK_URL/$ticket"
+link_url="$STORY_BASE_URL/$ticket"
 
 new_body=${body/$STORY_LINK_TEXT/$link_url}
 

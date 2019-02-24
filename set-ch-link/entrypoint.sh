@@ -20,7 +20,7 @@ new_title="${title/$GITHUB_REF/}"
 
 # Add the clubhouse number to the PR title
 if [[ ! "$new_title" =~ "$ticket" ]]; then
-    new_title="[ch${ticket}] $title"
+    new_title="[ch${ticket}] $new_title"
 fi
 
 cat > ~/.netrc <<-EOF

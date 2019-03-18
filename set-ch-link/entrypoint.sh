@@ -2,9 +2,7 @@
 
 OK=ok.sh
 
-event=$(cat "$GITHUB_EVENT_PATH")
 number=$(jq -r .number "$GITHUB_EVENT_PATH")
-action=$(jq -r .action "$GITHUB_EVENT_PATH")
 body=$(jq -r .pull_request.body "$GITHUB_EVENT_PATH")
 body=${body//$'\r'/} # Remove /r, which confuses jq in ok.sh
 title=$(jq -r .pull_request.title "$GITHUB_EVENT_PATH")
@@ -45,6 +43,6 @@ machine api.github.com
     password $GITHUB_TOKEN
 EOF
 
-if [[ "$ticket" != "" ]] && ([[ "$body" != "$new_body" ]] || [[ "$title" != "$new_title" ]]); then
+if [[ "$ticket" != "" && ( "$body" != "$new_body" || "$title" != "$new_title" ) ]]; then
     "$OK" update_pull_request "$GITHUB_REPOSITORY" "$number" "body='$new_body'" "title='$new_title'"
 fi

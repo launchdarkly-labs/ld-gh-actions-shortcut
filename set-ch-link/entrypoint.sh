@@ -8,6 +8,8 @@ body=${body//$'\r'/} # Remove /r, which confuses jq in ok.sh
 title=$(jq -r .pull_request.title "$GITHUB_EVENT_PATH")
 title=${title//$'\r'/} # Remove /r, which confuses jq in ok.sh
 
+echo "Current PR title is '${title}'"
+
 ticket_from_title=$(expr "$title" : '.*ch\([[:digit:]]*\).*')
 ticket_from_branch=$(expr "$GITHUB_REF" : '.*ch\([[:digit:]]*\).*')
 

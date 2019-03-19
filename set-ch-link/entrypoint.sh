@@ -10,15 +10,17 @@ title=${title//$'\r'/} # Remove /r, which confuses jq in ok.sh
 
 echo "Current PR title is '${title}'"
 
-ticket_from_title=$(expr "$title" : '.*ch\([[:digit:]]*\).*')
-ticket_from_branch=$(expr "$GITHUB_REF" : '.*ch\([[:digit:]]*\).*')
+pattern='.*\bch\([[:digit:]]\+\)\b.*'
+ticket_from_title=$(expr "$title" : "$pattern")
+ticket_from_branch=$(expr "$GITHUB_REF" : "$pattern")
 
 # Check title first for the CH ticket
 ticket="$ticket_from_title"
-echo "Found CH ticket number '${ticket_from_title}' in PR title"
 if [[ -z "$ticket" ]]; then
     ticket="$ticket_from_branch" # fall back to the CH ticket # from the branch
     echo "Found CH ticket number '${ticket}' in branch name"
+else
+    echo "Found CH ticket number '${ticket}' in PR title"
 fi
 
 link_url="$STORY_BASE_URL/$ticket"

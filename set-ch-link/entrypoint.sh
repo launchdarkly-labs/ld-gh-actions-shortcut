@@ -15,11 +15,10 @@ ticket_from_branch=$(expr "$GITHUB_REF" : '.*ch\([[:digit:]]*\).*')
 
 # Check title first for the CH ticket
 ticket="$ticket_from_title"
+echo "Found CH ticket number '${ticket_from_title}' in PR title"
 if [[ -z "$ticket" ]]; then
     ticket="$ticket_from_branch" # fall back to the CH ticket # from the branch
     echo "Found CH ticket number '${ticket}' in branch name"
-else
-    echo "Found CH ticket number '${ticket}' in PR title"
 fi
 
 link_url="$STORY_BASE_URL/$ticket"

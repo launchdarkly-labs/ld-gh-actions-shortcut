@@ -13,7 +13,7 @@ ticket_from_branch=$(expr "$GITHUB_REF" : '.*ch\([[:digit:]]*\).*')
 
 # Check title first for the CH ticket
 ticket="$ticket_from_title"
-if [[ -n "$ticket" ]]; then
+if [[ -z "$ticket" ]]; then
     ticket="$ticket_from_branch" # fall back to the CH ticket # from the branch
 fi
 

@@ -17,6 +17,8 @@ if [[ -n "$ticket" ]]; then
     ticket="$ticket_from_branch" # fall back to the CH ticket # from the branch
 fi
 
+echo Found CH ticket number "${ticket}"
+
 link_url="$STORY_BASE_URL/$ticket"
 
 new_body=${body/$STORY_LINK_TEXT/$link_url}

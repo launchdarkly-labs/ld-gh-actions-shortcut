@@ -7,12 +7,14 @@ body=$(jq -r .pull_request.body "$GITHUB_EVENT_PATH")
 body=${body//$'\r'/} # Remove /r, which confuses jq in ok.sh
 title=$(jq -r .pull_request.title "$GITHUB_EVENT_PATH")
 title=${title//$'\r'/} # Remove /r, which confuses jq in ok.sh
+branch=$(jq -r .pull_request.head.ref "$GITHUB_EVENT_PATH")
 
 echo "Current PR title is '${title}'"
+echo "Github ref is '$branch'"
 
 pattern='.*\bch\([[:digit:]]\+\)\b.*'
 ticket_from_title=$(expr "$title" : "$pattern")
-ticket_from_branch=$(expr "$GITHUB_REF" : "$pattern")
+ticket_from_branch=$(expr "$branch" : "$pattern")
 
 # Check title first for the CH ticket
 ticket="$ticket_from_title"

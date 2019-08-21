@@ -4,7 +4,7 @@ OK=ok.sh
 
 number=$(jq -r .number "$GITHUB_EVENT_PATH")
 action=$(jq -r .action "$GITHUB_EVENT_PATH")
-if  [[ "$action" != "edited" ]] && [[ "$action" != "opened" ]]; then
+if  [[ "$action" != "edited" ]] && [[ "$action" != "opened" ]] && [[ "$action" != "reopened" ]]; then
     exit 0
 fi
 
@@ -63,7 +63,7 @@ if [[ "$story" != "" && ( "$body" != "$new_body" || "$title" != "$new_title" ) ]
 fi
 
 # If we have no story add a comment to create one
-if [[ "$action" = "opened" ]] && [[ -z "$story" ]] && [[ -n "$CREATE_STORY_URL" ]]; then
+if ([[ "$action" = "opened" ]] || [[ "$action" = "reopened" ]]) && [[ -z "$story" ]] && [[ -n "$CREATE_STORY_URL" ]]; then
     "$OK" add_comment "$GITHUB_REPOSITORY" "$number" \
         "We could not find a CH story in this PR.  Please find or [create a story]($CREATE_STORY_URL) and add it to the PR title or description."
 fi

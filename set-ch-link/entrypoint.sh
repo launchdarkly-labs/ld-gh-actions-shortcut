@@ -18,16 +18,16 @@ title=${title//$'\r'/} # Remove /r, which confuses jq in ok.sh
 branch=$(jq -r .pull_request.head.ref "$GITHUB_EVENT_PATH")
 
 echo "Current PR title is '${title}'"
-echo "Github ref is '$branch'"
+echo "Github branch is '$branch'"
 
 pattern='.*\bch\([[:digit:]]\+\)\b.*'
 story_from_title=$(expr "$title" : "$pattern")
-story=$(expr "$branch" : "$pattern")
+story_from_branch=$(expr "$branch" : "$pattern")
 
 # Check title first for the CH story
 story="$story_from_title"
 if [[ -z "$story" ]]; then
-    story="$story" # fall back to the CH story # from the branch
+    story="$story_from_branch" # fall back to the CH story # from the branch
     echo "Found CH story number '${story}' in branch name"
 else
     echo "Found CH story number '${story}' in PR title"
@@ -66,7 +66,7 @@ if [[ "$story" != "" && ( "$body" != "$new_body" || "$title" != "$new_title" ) ]
 fi
 
 # If we have no story add a comment to create one
-if ([[ "$action" = "opened" ]] || [[ "$action" = "reopened" ]]) && [[ -z "$story" ]] && [[ -n "$CREATE_STORY_URL" ]]; then
+if { [[ "$action" = "opened" ]] || [[ "$action" = "reopened" ]]; } && [[ -z "$story" ]] && [[ -n "$CREATE_STORY_URL" ]]; then
     "$OK" add_comment "$GITHUB_REPOSITORY" "$number" \
         "We could not find a CH story in this PR.  Please find or [create a story]($CREATE_STORY_URL) and add it to the PR title or description."
 fi

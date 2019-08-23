@@ -24,13 +24,19 @@ pattern='.*\bch\([[:digit:]]\+\)\b.*'
 story_from_title=$(expr "$title" : "$pattern")
 story_from_branch=$(expr "$branch" : "$pattern")
 
+link_pattern='.*\story/\([[:digit:]]\+\)\b.*'
+story_from_body=$(expr "$body" : "$pattern")
+story_from_body_link=$(expr "$body" : "$link_pattern")
+
 # Check title first for the CH story
-story="$story_from_title"
+# shellcheck disable=SC2206
+stories=($story_from_title $story_from_branch $story_from_body $story_from_body_link)
+story="${stories[0]}"
+
 if [[ -z "$story" ]]; then
-    story="$story_from_branch" # fall back to the CH story # from the branch
-    echo "Found CH story number '${story}' in branch name"
+    echo "Could not find Clubhouse story"
 else
-    echo "Found CH story number '${story}' in PR title"
+    echo "Found CH story number '${story}'"
 fi
 
 link_url="$STORY_BASE_URL/$story"

@@ -68,8 +68,15 @@ machine api.github.com
     password $GITHUB_TOKEN
 EOF
 
-if [[ "$story" != "" && ( "$body" != "$new_body" || "$title" != "$new_title" ) ]]; then
-    "$OK" update_pull_request "$GITHUB_REPOSITORY" "$number" "body='$new_body'" "title='$new_title'"
+if [[ "$story" != "" && ( "$body" != "$new_body"  || "$title" != "$new_title" ) ]]; then
+    args=("title='$new_title'")
+    if [[ "$COMMENT_ONLY" != "1" ]]; then
+        args+=("body='$new_body'")
+    fi
+    "$OK" update_pull_request "$GITHUB_REPOSITORY" "$number" "${args[@]}"
+    if [[ "$COMMENT_ONLY" == "1"  ]]; then
+        "$OK" add_comment "$GITHUB_REPOSITORY" "$number" "CH link is $link_url."
+    fi
 fi
 
 # If we have no story add a comment to create one

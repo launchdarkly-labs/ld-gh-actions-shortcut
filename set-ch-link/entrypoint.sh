@@ -62,11 +62,15 @@ if [[ "$new_body" != *"$link_url"* ]] && [[ -n "$story" ]] ; then
     new_body="$link_url\n$new_body"
 fi
 
+branch_with_spaces_for_dashes="${branch//[_-]/}"
+
 # Strip out branch name from the PR title
 new_title="${title/$branch/}"
+new_title="${title/$branch_with_spaces_for_dashes/}"
 
 # Strip out uppercase branch name
 new_title="${new_title/${branch^}/}"
+new_title="${new_title/${branch_with_spaces_for_dashes^}/}"
 
 # Add the clubhouse number to the PR title if it isn't already there
 if [[ "$new_title" != *"$story"* ]]; then

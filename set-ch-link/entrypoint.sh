@@ -30,7 +30,7 @@ story_from_body=$(expr "$body" : "$pattern")
 story_from_body_link=$(expr "$body" : "$link_pattern")
 
 if [[ -n "$AUTOLINK_PREFIX" ]]; then
-  autolink_pattern="${AUTOLINK_PREFIX}([[:digit:]]\+\)\b.*"
+  autolink_pattern="${AUTOLINK_PREFIX}\([[:digit:]]\+\)\b.*"
   story_from_autolink=$(expr "$body" : "$autolink_pattern")
 fi
 

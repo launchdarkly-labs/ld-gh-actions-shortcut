@@ -62,7 +62,7 @@ if [[ "$new_body" != *"$link_url"* ]] && [[ -n "$story" ]] ; then
     new_body="$link_url\n$new_body"
 fi
 
-branch_with_spaces_for_dashes="${branch//[_-]/}"
+branch_with_spaces_for_dashes="${branch//[_-]/ }"
 
 # Strip out branch name from the PR title
 new_title="${title/$branch/}"

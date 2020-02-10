@@ -13,3 +13,10 @@ jobs:
           AUTOLINK_PREFIX: CH-
           STORY_LINK_TEXT: <!-- Story link goes here. If you named your branch using the Clubhouse suggested name, this link will autopopulate. -->
           CREATE_STORY_URL: https://app.clubhouse.io/testing/stories/new?template_id=5d3749a8-93bf-48e1-b8fc-1bfa7c74a625
+      - name: Set Clubhouse Link in comment
+        uses: ./set-ch-link
+        env:
+          COMMENT_ONLY: 1
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CREATE_STORY_URL: https://app.clubhouse.io/testing/stories/new?template_id=5d3749a8-93bf-48e1-b8fc-1bfa7c74a625
+          STORY_BASE_URL: https://app.clubhouse.io/testing/story

@@ -29,9 +29,14 @@ link_pattern='.*\story/\([[:digit:]]\+\)\b.*'
 story_from_body=$(expr "$body" : "$pattern")
 story_from_body_link=$(expr "$body" : "$link_pattern")
 
+if [[ -n "$AUTOLINK_PREFIX" ]]; then
+  autolink_pattern="${AUTOLINK_PREFIX}\([[:digit:]]\+\)\b.*"
+  story_from_autolink=$(expr "$body" : "$autolink_pattern")
+fi
+
 # Check title first for the CH story
 # shellcheck disable=SC2206
-stories=($story_from_title $story_from_branch $story_from_body $story_from_body_link)
+stories=($story_from_title $story_from_branch $story_from_body $story_from_autolink $story_from_body_link)
 story="${stories[0]}"
 
 if [[ -z "$story" ]]; then
@@ -40,7 +45,13 @@ else
     echo "Found CH story number '${story}'"
 fi
 
-link_url="$STORY_BASE_URL/$story"
+# If we have an autolink prefix to use, we use that instead of a link
+# See https://help.github.com/en/github/administering-a-repository/configuring-autolinks-to-reference-external-resources
+if [[ -n "$AUTOLINK_PREFIX" ]]; then
+  link_url="$AUTOLINK_PREFIX$story"
+else
+  link_url="$STORY_BASE_URL/$story"
+fi
 
 if [[ -n "$story" ]]; then
     new_body=${body/$STORY_LINK_TEXT/$link_url} # replace the story link text
@@ -51,11 +62,15 @@ if [[ "$new_body" != *"$link_url"* ]] && [[ -n "$story" ]] ; then
     new_body="$link_url\n$new_body"
 fi
 
+branch_with_spaces_for_dashes="${branch//[_-]/ }"
+
 # Strip out branch name from the PR title
 new_title="${title/$branch/}"
+new_title="${title/$branch_with_spaces_for_dashes/}"
 
 # Strip out uppercase branch name
 new_title="${new_title/${branch^}/}"
+new_title="${new_title/${branch_with_spaces_for_dashes^}/}"
 
 # Add the clubhouse number to the PR title if it isn't already there
 if [[ "$new_title" != *"$story"* ]]; then
@@ -69,7 +84,14 @@ machine api.github.com
 EOF
 
 if [[ "$story" != "" && ( "$body" != "$new_body" || "$title" != "$new_title" ) ]]; then
-    "$OK" update_pull_request "$GITHUB_REPOSITORY" "$number" "body='$new_body'" "title='$new_title'"
+    args=("title='$new_title'")
+    if [[ "$COMMENT_ONLY" != "1" ]]; then
+        args+=("body='$new_body'")
+    fi
+    "$OK" update_pull_request "$GITHUB_REPOSITORY" "$number" "${args[@]}"
+    if [[ "$COMMENT_ONLY" == "1" && "$action" == "opened" ]]; then
+        "$OK" add_comment "$GITHUB_REPOSITORY" "$number" "CH link is $link_url."
+    fi
 fi
 
 # If we have no story add a comment to create one

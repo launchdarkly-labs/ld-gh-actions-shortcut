@@ -10,7 +10,7 @@ Options:
 
 Add this to a `.yml` file in `.github/workflows/` to enable as follows:
 
-```
+``` yaml
 on: pull_request
 name: Pull request
 jobs:
@@ -18,7 +18,27 @@ jobs:
     name: Set Clubhouse Link in PR
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@master
+    - name: Set Clubhouse Link in PR
+      uses: launchdarkly/ld-gh-actions-clubhouse/set-ch-link@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        STORY_BASE_URL: https://app.clubhouse.io/launchdarkly/story
+        STORY_LINK_TEXT: <!-- Story link goes here -->
+        AUTOLINK_PREFIX: "CH-"
+        CREATE_TICKET_URL: https://app.clubhouse.io/launchdarkly/stories/new?template_id=<xxxxxx-xxxx-xxxx-xxxxxxxxxxx>
+```
+
+If your repository is mirrored (i.e. public/private) and you only want the action to run on one of the repositories, include an [`if` conditional](https://docs.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idif) at the job level:
+
+``` yaml
+on: pull_request
+name: Pull request
+jobs:
+  setClubhouseLinkInPR:
+    if: github.repository == 'org-name/mirrored-repo-private'
+    name: Set Clubhouse Link in PR
+    runs-on: ubuntu-latest
+    steps:
     - name: Set Clubhouse Link in PR
       uses: launchdarkly/ld-gh-actions-clubhouse/set-ch-link@master
       env:

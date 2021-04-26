@@ -7,6 +7,7 @@ Options:
   * `AUTOLINK_PREFIX` - Set this instead of STORY_BASE_URL if you just want to rely on github's prefix-based autolinking feature to create links
   * `COMMENT_ONLY` - Set this to "1" just add a comment with a Clubhouse link and only do it when a PR is first opened.  This avoids conflicts that
     could cause you to lose manually PR description changes made while the github action is running.
+  * `SKIP_LINK` - Set this to "1" to avoid adding a link either in a comment or in the body.
 
 Add this to a `.yml` file in `.github/workflows/` to enable as follows:
 

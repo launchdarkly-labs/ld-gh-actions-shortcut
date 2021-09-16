@@ -72,7 +72,7 @@ new_title="${title/$branch_with_spaces_for_dashes/}"
 new_title="${new_title/${branch^}/}"
 new_title="${new_title/${branch_with_spaces_for_dashes^}/}"
 
-# Add the clubhouse number to the PR title if it isn't already there
+# Add the story number to the PR title if it isn't already there
 if [[ "$new_title" != *"$story"* ]]; then
     new_title="[sc${story}] $new_title"
 fi

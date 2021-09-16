@@ -15,11 +15,11 @@ Add this to a `.yml` file in `.github/workflows/` to enable as follows:
 on: pull_request
 name: Pull request
 jobs:
-  setClubhouseLinkInPR:
-    name: Set Clubhouse Link in PR
+  setShortcutLinkInPR:
+    name: Set Shortcut Link in PR
     runs-on: ubuntu-latest
     steps:
-    - name: Set Clubhouse Link in PR
+    - name: Set Shortcut Link in PR
       uses: launchdarkly/ld-gh-actions-clubhouse/set-ch-link@master
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -35,7 +35,7 @@ If your repository is mirrored (i.e. public/private) and you only want the actio
 on: pull_request
 name: Pull request
 jobs:
-  setClubhouseLinkInPR:
+  setShortcutLinkInPR:
     if: github.repository == 'org-name/mirrored-repo-private'
     name: Set Shortcut Link in PR
     runs-on: ubuntu-latest

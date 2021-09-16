@@ -21,7 +21,7 @@ branch=$(jq -r .pull_request.head.ref "$GITHUB_EVENT_PATH")
 echo "Current PR title is '${title}'"
 echo "Github branch is '$branch'"
 
-pattern='.*\bch\([[:digit:]]\+\)\b.*'
+pattern='.*\b(ch|sc)\([[:digit:]]\+\)\b.*'
 story_from_title=$(expr "$title" : "$pattern")
 story_from_branch=$(expr "$branch" : "$pattern")
 
@@ -40,9 +40,9 @@ stories=($story_from_title $story_from_branch $story_from_body $story_from_autol
 story="${stories[0]}"
 
 if [[ -z "$story" ]]; then
-    echo "Could not find Clubhouse story"
+    echo "Could not find Shortcut story"
 else
-    echo "Found CH story number '${story}'"
+    echo "Found Shortcut story number '${story}'"
 fi
 
 # If we have an autolink prefix to use, we use that instead of a link
@@ -74,7 +74,7 @@ new_title="${new_title/${branch_with_spaces_for_dashes^}/}"
 
 # Add the clubhouse number to the PR title if it isn't already there
 if [[ "$new_title" != *"$story"* ]]; then
-    new_title="[ch${story}] $new_title"
+    new_title="[sc${story}] $new_title"
 fi
 
 cat > ~/.netrc <<-EOF
@@ -98,5 +98,5 @@ fi
 draft=$(jq -r .pull_request.draft "$GITHUB_EVENT_PATH")
 if { [[ "$action" = "opened" ]] || [[ "$action" = "reopened" ]]; } && [[ -z "$story" ]] && [[ "$draft" != "true" ]] && [[ -n "$CREATE_STORY_URL" ]]; then
     "$OK" add_comment "$GITHUB_REPOSITORY" "$number" \
-        "We could not find a CH story in this PR.  Please find or [create a story]($CREATE_STORY_URL) and add it to the PR title or description."
+        "We could not find a Shortcut story in this PR.  Please find or [create a story]($CREATE_STORY_URL) and add it to the PR title or description."
 fi

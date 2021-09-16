@@ -90,7 +90,7 @@ if [[ "$story" != "" && ( "$body" != "$new_body" || "$title" != "$new_title" ) ]
     fi
     "$OK" update_pull_request "$GITHUB_REPOSITORY" "$number" "${args[@]}"
     if [[ "$COMMENT_ONLY" == "1" && "$SKIP_LINK" != "1" && "$action" == "opened" ]]; then
-        "$OK" add_comment "$GITHUB_REPOSITORY" "$number" "CH link is $link_url."
+        "$OK" add_comment "$GITHUB_REPOSITORY" "$number" "Shortcut link is $link_url."
     fi
 fi
 

@@ -1,20 +1,20 @@
 on: pull_request
 name: Pull request
 jobs:
-  setClubhouseLinkInPR:
-    name: Set Clubhouse Link in PR
+  setLinkInPR:
+    name: Set Link in PR
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - name: Set Shortcut Link in PR
-        uses: ./set-ch-link
+      - name: Set Link in PR
+        uses: ./set-link
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           AUTOLINK_PREFIX: SC-
           STORY_LINK_TEXT: <!-- Story link goes here. If you named your branch using the Shortcut suggested name, this link will autopopulate. -->
           CREATE_STORY_URL: https://app.shortcut.com/testing/stories/new?template_id=5d3749a8-93bf-48e1-b8fc-1bfa7c74a625
-      - name: Set Clubhouse Link in comment
-        uses: ./set-ch-link
+      - name: Set Link in comment
+        uses: ./set-link
         env:
           COMMENT_ONLY: 1
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

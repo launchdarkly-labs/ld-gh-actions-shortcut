@@ -21,7 +21,7 @@ branch=$(jq -r .pull_request.head.ref "$GITHUB_EVENT_PATH")
 echo "Current PR title is '${title}'"
 echo "Github branch is '$branch'"
 
-pattern='.*\bsc-?\([[:digit:]]\+\)\b.*'
+pattern='.*\bsc-\{0,1\}\([[:digit:]]\+\)\b.*'
 story_from_title=$(expr "$title" : "$pattern")
 story_from_branch=$(expr "$branch" : "$pattern")
 

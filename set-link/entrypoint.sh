@@ -21,7 +21,7 @@ branch=$(jq -r .pull_request.head.ref "$GITHUB_EVENT_PATH")
 echo "Current PR title is '${title}'"
 echo "Github branch is '$branch'"
 
-pattern='.*\bsc\([[:digit:]]\+\)\b.*'
+pattern='.*\bsc-\{0,1\}\([[:digit:]]\+\)\b.*'
 story_from_title=$(expr "$title" : "$pattern")
 story_from_branch=$(expr "$branch" : "$pattern")
 
@@ -74,7 +74,7 @@ new_title="${new_title/${branch_with_spaces_for_dashes^}/}"
 
 # Add the story number to the PR title if it isn't already there
 if [[ "$new_title" != *"$story"* ]]; then
-    new_title="[sc${story}] $new_title"
+    new_title="[sc-${story}] $new_title"
 fi
 
 cat > ~/.netrc <<-EOF

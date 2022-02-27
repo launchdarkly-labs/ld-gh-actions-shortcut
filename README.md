@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Set Story Link in PR
-      uses: launchdarkly/ld-gh-actions-shortcut/set-link@master
+      uses: launchdarkly/ld-gh-actions-shortcut/set-link@main
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         STORY_BASE_URL: https://app.shortcut.com/launchdarkly/story
@@ -41,7 +41,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Set Story Link in PR
-      uses: launchdarkly/ld-gh-actions-shortcut/set-ch-link@master
+      uses: launchdarkly/ld-gh-actions-shortcut/set-ch-link@main
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         STORY_BASE_URL: https://app.shortcut.com/launchdarkly/story

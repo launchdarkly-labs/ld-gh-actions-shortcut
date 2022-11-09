@@ -68,6 +68,8 @@ new_title="${title}"
 
 formatted_title=`echo ${new_title} | cut -d "/" -f 3`
 
+echo "Formatted title is '${formatted_title}'"
+
 if [[ "$formatted_title" != " " ]]; then
   new_title="${formatted_title}"
 fi
@@ -76,8 +78,8 @@ fi
 if [[ "$new_title" != "[sc-$story]" ]]; then
     new_title="[sc-${story}] ${new_title^}"
 fi
-# match the branch name with regex
-# Cdelst/sc 161210/fix shortcut story pr integration
+
+echo "Final new title is '${new_title}'"
 
 
 cat > ~/.netrc <<-EOF

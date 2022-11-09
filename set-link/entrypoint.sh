@@ -67,7 +67,7 @@ branch_with_spaces_for_dashes="${branch//[_-]/ }"
 new_title="${title}"
 
 # Add the story number to the PR title if it isn't already there
-if [[ "$new_title" != *"$story"* ]]; then
+if [[ "$new_title" != "[sc-$story]" ]]; then
     new_title="[sc-${story}] $new_title"
 fi
 

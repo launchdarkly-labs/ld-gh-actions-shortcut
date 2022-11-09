@@ -74,7 +74,7 @@ fi
 
 # Add the story number to the PR title if it isn't already there
 if [[ "$new_title" != "[sc-$story]" ]]; then
-    new_title="[sc-${story}] $new_title"
+    new_title="[sc-${story}] ${new_title^}"
 fi
 # match the branch name with regex
 # Cdelst/sc 161210/fix shortcut story pr integration

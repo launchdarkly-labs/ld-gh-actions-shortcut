@@ -70,12 +70,12 @@ formatted_title=`echo ${new_title} | cut -d "/" -f 3`
 
 echo "Formatted title is '${formatted_title}'"
 
-if [[ "$formatted_title" != " " ]]; then
+if [[ "$formatted_title" != " " && "$formatted_title" != "" ]]; then
   new_title="${formatted_title}"
 fi
 
 # Add the story number to the PR title if it isn't already there
-if [[ "$new_title" != "[sc-$story]" ]]; then
+if [[ "$new_title" != *"[sc-$story]"* ]]; then
     new_title="[sc-${story}] ${new_title^}"
 fi
 

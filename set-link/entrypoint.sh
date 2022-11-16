@@ -66,11 +66,11 @@ branch_with_spaces_for_dashes="${branch//[_-]/ }"
 
 new_title="${title}"
 
-formatted_title=`echo ${new_title} | cut -d "/" -f 3`
+formatted_title=`echo ${new_title} | cut -d "sc-${story}/" -f 2`
 
 echo "Formatted title is '${formatted_title}'"
 
-if [[ "$formatted_title" != " " || "$formatted_title" != "" ]]; then
+if [[ "$formatted_title" != " " && "$formatted_title" != "" ]]; then
   new_title="${formatted_title}"
 fi
 

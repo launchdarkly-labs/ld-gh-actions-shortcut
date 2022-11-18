@@ -81,11 +81,10 @@ echo "New title with removed ticket is '${new_title}'"
 
 # Add the story number to the PR title if it isn't already there
 if [[ "$story_removed_title" != *"[sc-$story]"* ]]; then
-    new_title="[sc-${story}] ${new_title^}"
+    new_title="[sc-${story}] ${story_removed_title^}"
 fi
 
 echo "Final new title is '${new_title}'"
-
 
 cat > ~/.netrc <<-EOF
 machine api.github.com
@@ -104,7 +103,7 @@ if [[ "$story" != "" && ( "$body" != "$new_body" || "$title" != "$new_title" ) ]
     fi
 
     if [[ "${story_removed_title}" != "${before_story_removed}" ]]; then
-            "$OK" add_comment "$GITHUB_REPOSITORY" "$number" "Ahem, @${user}.  I know it's fun to add the shortcut ticket number to the PR name manually, but I'm here to help (also, it's one of the only reasons I exist).  Also, it's less fun for me if you do it :("
+            "$OK" add_comment "$GITHUB_REPOSITORY" "$number" "Ahem, @${user}.  I know it's fun to add the shortcut ticket number to the PR name manually, but I'm here to help (also, it's one of the only reasons I exist).  It's less fun for me if you do it :("
     fi
 fi
 

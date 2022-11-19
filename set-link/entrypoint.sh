@@ -17,6 +17,7 @@ body=${body//$'\r'/} # Remove /r, which confuses jq in ok.sh
 title=$(jq -r .pull_request.title "$GITHUB_EVENT_PATH")
 title=${title//$'\r'/} # Remove /r, which confuses jq in ok.sh
 branch=$(jq -r .pull_request.head.ref "$GITHUB_EVENT_PATH")
+user=$(jq -r .pull_request.user.login "$GITHUB_EVENT_PATH")
 
 echo "Current PR title is '${title}'"
 echo "Github branch is '$branch'"
@@ -62,11 +63,9 @@ if [[ "$new_body" != *"$link_url"* ]] && [[ -n "$story" ]] ; then
     new_body="$link_url\n$new_body"
 fi
 
-branch_with_spaces_for_dashes="${branch//[_-]/ }"
-
 new_title="${title}"
 
-formatted_title=`echo ${new_title} | cut -d "/" -f 3`
+formatted_title=`echo "${new_title}" | cut -d "/" -f 3`
 
 echo "Formatted title is '${formatted_title}'"
 
@@ -74,13 +73,18 @@ if [[ "$formatted_title" != " " && "$formatted_title" != "" ]]; then
   new_title="${formatted_title}"
 fi
 
+# Remove the story from anywhere in the name
+story_removed_title=${new_title/"[sc-$story]"/""}
+before_story_removed="${new_title}"
+
+echo "New title with removed ticket is '${new_title}'"
+
 # Add the story number to the PR title if it isn't already there
-if [[ "$new_title" != *"[sc-$story]"* ]]; then
-    new_title="[sc-${story}] ${new_title^}"
+if [[ "$story_removed_title" != *"[sc-$story]"* ]]; then
+    new_title="[sc-${story}] ${story_removed_title^}"
 fi
 
 echo "Final new title is '${new_title}'"
-
 
 cat > ~/.netrc <<-EOF
 machine api.github.com
@@ -96,6 +100,10 @@ if [[ "$story" != "" && ( "$body" != "$new_body" || "$title" != "$new_title" ) ]
     "$OK" update_pull_request "$GITHUB_REPOSITORY" "$number" "${args[@]}"
     if [[ "$COMMENT_ONLY" == "1" && "$SKIP_LINK" != "1" && "$action" == "opened" ]]; then
         "$OK" add_comment "$GITHUB_REPOSITORY" "$number" "Shortcut link is $link_url."
+
+        if [[ "${story_removed_title}" != "${before_story_removed}" ]]; then
+                    "$OK" add_comment "$GITHUB_REPOSITORY" "$number" "Ahem, @${user}.  I know it's fun to add the shortcut ticket number to the PR name manually, but I'm here to help (also, it's one of the only reasons I exist).  It's less fun for me if you do it :("
+        fi
     fi
 fi
 

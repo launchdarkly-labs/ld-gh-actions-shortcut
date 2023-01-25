@@ -74,7 +74,7 @@ if [[ "$formatted_title" != " " && "$formatted_title" != "" ]]; then
 fi
 
 # Remove the story from anywhere in the name, removes [123456], [sc-123456], [SC-123456]
-story_removed_title=${new_title/"[sc-$story]"/""}
+story_removed_title=${new_title/"[sc(-| )$story]"/""}
 story_removed_title=${story_removed_title/"[$story]"/""}
 story_removed_title=${story_removed_title/"[SC-$story]"/""}
 before_story_removed="${new_title}"

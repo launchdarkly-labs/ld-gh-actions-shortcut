@@ -2,7 +2,7 @@ FROM alpine
 
 RUN apk add --no-cache bash jq curl wget
 
-ARG OK_SH_VERSION=0.4.0
+ARG OK_SH_VERSION=0.7.0
 
 # Install ok.sh, a bash github client
 RUN cd /tmp && \

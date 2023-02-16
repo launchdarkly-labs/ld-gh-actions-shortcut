@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set -euxo pipefail
 
 [[ -z ${GITHUB_TOKEN:-} ]] && printf >&2 "error: GITHUB_TOKEN missing\n" && exit 1
 

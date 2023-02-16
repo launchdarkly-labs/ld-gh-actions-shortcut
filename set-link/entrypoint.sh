@@ -12,7 +12,7 @@ COMMENT_ONLY="${COMMENT_ONLY:-}"
 SKIP_LINK="${SKIP_LINK:-}"
 
 echo "Received event:"
-#cat "$GITHUB_EVENT_PATH"
+cat "$GITHUB_EVENT_PATH"
 echo
 
 number=$(jq -r .number "$GITHUB_EVENT_PATH")

@@ -95,8 +95,8 @@ fi
 
 echo "Final new title is '${new_title}'"
 
-"$OK" -j list_issue_comments "$GITHUB_REPOSITORY" "$number" | jq -e '. | map(select(.user?.login? == "shortcut-integration[bot]")) | .[0]' >/dev/null
-SKIP_COMMENT="$?"
+SKIP_COMMENT="0"
+"$OK" -j list_issue_comments "$GITHUB_REPOSITORY" "$number" | jq -e '. | map(select(.user?.login? == "shortcut-integration[bot]")) | .[0]' >/dev/null || SKIP_COMMENT="$?"
 
 if [[ "$story" != "" ]] && { [[ "$body" != "$new_body" || "$title" != "$new_title" ]]; }; then
   args=()
@@ -104,7 +104,9 @@ if [[ "$story" != "" ]] && { [[ "$body" != "$new_body" || "$title" != "$new_titl
   if [[ "$body" != "$new_body" && "$COMMENT_ONLY" != "1" && "$SKIP_LINK" != "1" ]]; then
     args+=("body='$new_body'")
   fi
-  "$OK" update_pull_request "$GITHUB_REPOSITORY" "$number" "${args[@]}"
+  if ((${#args[@]} > 0)); then
+    "$OK" update_pull_request "$GITHUB_REPOSITORY" "$number" "${args[@]}"
+  fi
 
   if [[ "$COMMENT_ONLY" == "1" && "$SKIP_LINK" != "1" && "$SKIP_COMMENT" == "0" && "$action" == "opened" ]]; then
     echo "$OK" add_comment "$GITHUB_REPOSITORY" "$number" "Shortcut link is $link_url."

@@ -118,7 +118,7 @@ fi
 
 # If we have no story add a comment to create one
 draft=$(jq -r .pull_request.draft "$GITHUB_EVENT_PATH")
-if [[ "$SKIP_COMMENT" == "0" ]] && { [[ "$action" = "opened" || "$action" = "reopened" ]]; } && [[ -z "$story" && "$draft" != "true" && -n "$CREATE_STORY_URL" ]]; then
+if [[ "$SKIP_COMMENT" == "0" ]] && { [[ "$action" == "opened" || "$action" == "reopened" ]]; } && [[ -z "$story" && "$draft" != "true" && -n "$CREATE_STORY_URL" ]]; then
   echo "$OK" add_comment "$GITHUB_REPOSITORY" "$number" \
     "We could not find a Shortcut story in this PR.  Please find or [create a story]($CREATE_STORY_URL) and add it to the PR title or description."
 fi

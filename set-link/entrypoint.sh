@@ -47,10 +47,11 @@ if [[ -n "$AUTOLINK_PREFIX" ]]; then
   [[ $body =~ $autolink_pattern ]] && stories+=("${BASH_REMATCH[1]}")
 fi
 
-story="${stories[0]}"
-if [[ -z "$story" ]]; then
+story=""
+if (( ${#stories[@]} == 0 )); then
   echo "Could not find Shortcut story"
 else
+  story="${stories[0]}"
   echo "Found Shortcut story number '${story}'"
 fi
 
@@ -62,17 +63,18 @@ else
   link_url="$STORY_BASE_URL/$story"
 fi
 
+new_body="$body"
 if [[ -n "$story" ]]; then
-  new_body=${body/$STORY_LINK_TEXT/$link_url} # replace the story link text
-fi
+  new_body="${new_body/$STORY_LINK_TEXT/$link_url}" # replace the story link text
 
-# If we still don't have the url in the body, tack it on the beginning
-if [[ "$new_body" != *"$link_url"* && -n "$story" ]]; then
-  new_body="$link_url\n$new_body"
+  # If we still don't have the url in the body, tack it on the beginning
+  if [[ "$new_body" != *"$link_url"* ]]; then
+    new_body="$link_url\n$new_body"
+  fi
 fi
 
 new_title="${title}"
-if [[ $title =~ ^[a-zA-Z]+/sc-[[:digit:]]+/(.+) ]]; then
+if [[ $title =~ ^[a-zA-Z]+/[Ss][Cc](-| )[[:digit:]]+/(.+) ]]; then
   formatted_title="${BASH_REMATCH[1]}"
   echo "Formatted title is '${formatted_title}'"
   if [[ "$formatted_title" != " " && "$formatted_title" != "" ]]; then
@@ -80,19 +82,20 @@ if [[ $title =~ ^[a-zA-Z]+/sc-[[:digit:]]+/(.+) ]]; then
   fi
 fi
 
+if [[ -n $story ]]; then
+  # Remove the story from anywhere in the name, removes [123456], [sc-123456], [sc 123456]
+  while [[ $new_title =~ (.*)\[([Ss][Cc](-| )?)?$story\](.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
+  while [[ $new_title =~ (.*)([Ss][Cc](-| )?)?$story(.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
+  new_title="${new_title//+( )/ }"
+  new_title="${new_title#"${new_title%%[![:space:]]*}"}"
+  new_title="${new_title%"${new_title##*[![:space:]]}"}"
 
-# Remove the story from anywhere in the name, removes [123456], [sc-123456], [sc 123456]
-while [[ $new_title =~ (.*)\[([Ss][Cc](-| )?)?$story\](.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
-while [[ $new_title =~ (.*)([Ss][Cc](-| )?)?$story(.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
-new_title="${new_title//+( )/ }"
-new_title="${new_title#"${new_title%%[![:space:]]*}"}"
-new_title="${new_title%"${new_title##*[![:space:]]}"}"
+  echo "New title with removed ticket is '${new_title}'"
 
-echo "New title with removed ticket is '${new_title}'"
-
-# Add the story number to the PR title if it isn't already there
-if [[ "$new_title" != *"[sc-$story]"* ]]; then
-  new_title="[sc-${story}] ${new_title^}"
+  # Add the story number to the PR title if it isn't already there
+  if [[ "$new_title" != *"[sc-$story]"* ]]; then
+    new_title="[sc-${story}] ${new_title^}"
+  fi
 fi
 
 echo "Final new title is '${new_title}'"
@@ -100,7 +103,7 @@ echo "Final new title is '${new_title}'"
 SKIP_COMMENT="0"
 "$OK" -j list_issue_comments "$GITHUB_REPOSITORY" "$number" | jq -e '. | map(select(.user?.login? == "shortcut-integration[bot]")) | .[0]' >/dev/null || SKIP_COMMENT="$?"
 
-if [[ "$story" != "" ]] && { [[ "$body" != "$new_body" || "$title" != "$new_title" ]]; }; then
+if [[ -n $story ]] && { [[ "$body" != "$new_body" || "$title" != "$new_title" ]]; }; then
   args=()
   [[ "$title" != "$new_title" ]] && args+=("title='$new_title'")
   if [[ "$body" != "$new_body" && "$COMMENT_ONLY" != "1" && "$SKIP_LINK" != "1" ]]; then

@@ -84,8 +84,10 @@ fi
 
 if [[ -n $story ]]; then
   # Remove the story from anywhere in the name, removes [123456], [sc-123456], [sc 123456]
-  while [[ $new_title =~ (.*)\[([Ss][Cc](-| )?)?$story\](.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
-  while [[ $new_title =~ (.*)([Ss][Cc](-| )?)?$story(.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
+  while [[ $new_title =~ (.*)\[([Ss][Cc](-| )?)$story\](.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
+  while [[ $new_title =~ (.*)([Ss][Cc](-| )?)$story(.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
+  while [[ $new_title =~ (.*)\[$story\](.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
+  while [[ $new_title =~ (.*)$story(.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
   new_title="${new_title//+( )/ }"
   new_title="${new_title#"${new_title%%[![:space:]]*}"}"
   new_title="${new_title%"${new_title##*[![:space:]]}"}"

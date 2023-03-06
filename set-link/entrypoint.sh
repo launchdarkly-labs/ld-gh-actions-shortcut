@@ -19,7 +19,7 @@ echo
 
 number=$(jq -r .number "$GITHUB_EVENT_PATH")
 action=$(jq -r .action "$GITHUB_EVENT_PATH")
-if [[ "$action" != "edited" ]] && [[ "$action" != "opened" ]] && [[ "$action" != "reopened" ]]; then
+if [[ "$action" != "edited" && "$action" != "opened" && "$action" != "reopened" && "$action" != "synchronize" ]]; then
   exit 0
 fi
 

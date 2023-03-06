@@ -34,12 +34,12 @@ echo "Github branch is '$branch'"
 
 stories=()
 
-pattern=".*\bsc-?([[:digit:]]+)\b.*"
-[[ $title =~ $pattern ]] && stories+=("${BASH_REMATCH[1]}")
-[[ $branch =~ $pattern ]] && stories+=("${BASH_REMATCH[1]}")
+pattern=".*\b(sc|ch)-?([[:digit:]]+)\b.*"
+[[ $title =~ $pattern ]] && stories+=("${BASH_REMATCH[2]}")
+[[ $branch =~ $pattern ]] && stories+=("${BASH_REMATCH[2]}")
 
 link_pattern=".*story/([[:digit:]]+)\b.*"
-[[ $body =~ $pattern ]] && stories+=("${BASH_REMATCH[1]}")
+[[ $body =~ $pattern ]] && stories+=("${BASH_REMATCH[2]}")
 [[ $body =~ $link_pattern ]] && stories+=("${BASH_REMATCH[1]}")
 
 if [[ -n "$AUTOLINK_PREFIX" ]]; then
@@ -74,8 +74,8 @@ if [[ -n "$story" ]]; then
 fi
 
 new_title="${title}"
-if [[ $title =~ ^[a-zA-Z]+/[Ss][Cc](-| )[[:digit:]]+/(.+) ]]; then
-  formatted_title="${BASH_REMATCH[2]}"
+if [[ $title =~ ^[a-zA-Z]+/([Ss][Cc]|[Cc][Hh])(-| )[[:digit:]]+/(.+) ]]; then
+  formatted_title="${BASH_REMATCH[3]}"
   echo "Formatted title is '${formatted_title}'"
   if [[ "$formatted_title" != " " && "$formatted_title" != "" ]]; then
     new_title="$(IFS=- read -ra str <<<"${formatted_title^}"; printf ' %s' "${str[@]}")"
@@ -84,13 +84,13 @@ fi
 
 if [[ -n $story ]]; then
   # Remove the story from anywhere in the name, removes [123456], [sc-123456], [sc 123456]
-  while [[ $new_title =~ (.*)\[([Ss][Cc](-| )?)$story\](.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
-  while [[ $new_title =~ (.*)([Ss][Cc](-| )?)$story(.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
+  while [[ $new_title =~ (.*)\[([Ss][Cc]|[Cc][Hh])(-| )?$story\](.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
+  while [[ $new_title =~ (.*)([Ss][Cc]|[Cc][Hh])(-| )?$story(.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
   while [[ $new_title =~ (.*)\[$story\](.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[2]}; done
   while [[ $new_title =~ (.*)$story(.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[2]}; done
   new_title="${new_title//+( )/ }"
-  new_title="${new_title#"${new_title%%[![:space:]]*}"}"
-  new_title="${new_title%"${new_title##*[![:space:]]}"}"
+  new_title="${new_title#"${new_title%%[![:space:]-:]*}"}"
+  new_title="${new_title%"${new_title##*[![:space:]-:]}"}"
 
   echo "New title with removed ticket is '${new_title}'"
 

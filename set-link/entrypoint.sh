@@ -34,17 +34,18 @@ echo "Github branch is '$branch'"
 
 stories=()
 
-pattern=".*\b(sc|ch)-?([[:digit:]]+)\b.*"
-[[ $title =~ $pattern ]] && stories+=("${BASH_REMATCH[2]}")
-[[ $branch =~ $pattern ]] && stories+=("${BASH_REMATCH[2]}")
+prefix_pattern="([Ss][Cc]|[Cc][Hh])(-| )?"
+
+pattern=".*\b${prefix_pattern}([[:digit:]]+)\b.*"
+[[ $title =~ $pattern ]] && stories+=("${BASH_REMATCH[3]}")
+[[ $branch =~ $pattern ]] && stories+=("${BASH_REMATCH[3]}")
 
 link_pattern=".*story/([[:digit:]]+)\b.*"
-[[ $body =~ $pattern ]] && stories+=("${BASH_REMATCH[2]}")
+[[ $body =~ $pattern ]] && stories+=("${BASH_REMATCH[3]}")
 [[ $body =~ $link_pattern ]] && stories+=("${BASH_REMATCH[1]}")
 
 if [[ -n "$AUTOLINK_PREFIX" ]]; then
-  autolink_pattern="${AUTOLINK_PREFIX}([[:digit:]]+)\b.*"
-  [[ $body =~ $autolink_pattern ]] && stories+=("${BASH_REMATCH[1]}")
+  [[ $body =~ ${AUTOLINK_PREFIX}([[:digit:]]+)\b.* ]] && stories+=("${BASH_REMATCH[1]}")
 fi
 
 story=""
@@ -74,7 +75,7 @@ if [[ -n "$story" ]]; then
 fi
 
 new_title="${title}"
-if [[ $title =~ ^[a-zA-Z]+/([Ss][Cc]|[Cc][Hh])(-| )[[:digit:]]+/(.+) ]]; then
+if [[ $title =~ ^[a-zA-Z]+/${prefix_pattern}[[:digit:]]+/(.+) ]]; then
   formatted_title="${BASH_REMATCH[3]}"
   echo "Formatted title is '${formatted_title}'"
   if [[ "$formatted_title" != " " && "$formatted_title" != "" ]]; then
@@ -84,8 +85,8 @@ fi
 
 if [[ -n $story ]]; then
   # Remove the story from anywhere in the name, removes [123456], [sc-123456], [sc 123456]
-  while [[ $new_title =~ (.*)\[([Ss][Cc]|[Cc][Hh])(-| )?$story\](.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
-  while [[ $new_title =~ (.*)([Ss][Cc]|[Cc][Hh])(-| )?$story(.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
+  while [[ $new_title =~ (.*)\[${prefix_pattern}$story\](.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
+  while [[ $new_title =~ (.*)${prefix_pattern}$story(.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
   while [[ $new_title =~ (.*)\[$story\](.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[2]}; done
   while [[ $new_title =~ (.*)$story(.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[2]}; done
   new_title="${new_title//+( )/ }"

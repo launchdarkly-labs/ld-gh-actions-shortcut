@@ -19,7 +19,7 @@ echo
 
 number=$(jq -r .number "$GITHUB_EVENT_PATH")
 action=$(jq -r .action "$GITHUB_EVENT_PATH")
-if [[ "$action" != "edited" ]] && [[ "$action" != "opened" ]] && [[ "$action" != "reopened" ]]; then
+if [[ "$action" != "edited" && "$action" != "opened" && "$action" != "reopened" && "$action" != "synchronize" ]]; then
   exit 0
 fi
 
@@ -34,17 +34,18 @@ echo "Github branch is '$branch'"
 
 stories=()
 
-pattern=".*\bsc-?([[:digit:]]+)\b.*"
-[[ $title =~ $pattern ]] && stories+=("${BASH_REMATCH[1]}")
-[[ $branch =~ $pattern ]] && stories+=("${BASH_REMATCH[1]}")
+prefix_pattern="([Ss][Cc]|[Cc][Hh])(-| )?"
+
+pattern=".*\b${prefix_pattern}([[:digit:]]+)\b.*"
+[[ $title =~ $pattern ]] && stories+=("${BASH_REMATCH[3]}")
+[[ $branch =~ $pattern ]] && stories+=("${BASH_REMATCH[3]}")
 
 link_pattern=".*story/([[:digit:]]+)\b.*"
-[[ $body =~ $pattern ]] && stories+=("${BASH_REMATCH[1]}")
+[[ $body =~ $pattern ]] && stories+=("${BASH_REMATCH[3]}")
 [[ $body =~ $link_pattern ]] && stories+=("${BASH_REMATCH[1]}")
 
 if [[ -n "$AUTOLINK_PREFIX" ]]; then
-  autolink_pattern="${AUTOLINK_PREFIX}([[:digit:]]+)\b.*"
-  [[ $body =~ $autolink_pattern ]] && stories+=("${BASH_REMATCH[1]}")
+  [[ $body =~ ${AUTOLINK_PREFIX}([[:digit:]]+)\b.* ]] && stories+=("${BASH_REMATCH[1]}")
 fi
 
 story=""
@@ -74,29 +75,29 @@ if [[ -n "$story" ]]; then
 fi
 
 new_title="${title}"
-if [[ $title =~ ^[a-zA-Z]+/[Ss][Cc](-| )[[:digit:]]+/(.+) ]]; then
-  formatted_title="${BASH_REMATCH[1]}"
+if [[ $title =~ ^[a-zA-Z]+/${prefix_pattern}[[:digit:]]+/(.+) ]]; then
+  formatted_title="${BASH_REMATCH[3]}"
   echo "Formatted title is '${formatted_title}'"
   if [[ "$formatted_title" != " " && "$formatted_title" != "" ]]; then
-    new_title="${formatted_title}"
+    new_title="$(IFS=- read -ra str <<<"${formatted_title^}"; printf ' %s' "${str[@]}")"
   fi
 fi
 
 if [[ -n $story ]]; then
   # Remove the story from anywhere in the name, removes [123456], [sc-123456], [sc 123456]
-  while [[ $new_title =~ (.*)\[([Ss][Cc](-| )?)$story\](.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
-  while [[ $new_title =~ (.*)([Ss][Cc](-| )?)$story(.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
+  while [[ $new_title =~ (.*)\[${prefix_pattern}$story\](.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
+  while [[ $new_title =~ (.*)${prefix_pattern}$story(.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[4]}; done
   while [[ $new_title =~ (.*)\[$story\](.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[2]}; done
   while [[ $new_title =~ (.*)$story(.*) ]]; do new_title=${BASH_REMATCH[1]}${BASH_REMATCH[2]}; done
   new_title="${new_title//+( )/ }"
-  new_title="${new_title#"${new_title%%[![:space:]]*}"}"
-  new_title="${new_title%"${new_title##*[![:space:]]}"}"
+  new_title="${new_title#"${new_title%%[![:space:]-:]*}"}"
+  new_title="${new_title%"${new_title##*[![:space:]-:]}"}"
 
   echo "New title with removed ticket is '${new_title}'"
 
   # Add the story number to the PR title if it isn't already there
   if [[ "$new_title" != *"[sc-$story]"* ]]; then
-    new_title="[sc-${story}] ${new_title^}"
+    new_title="[sc-${story}] ${new_title}"
   fi
 fi
 

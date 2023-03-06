@@ -75,10 +75,10 @@ fi
 
 new_title="${title}"
 if [[ $title =~ ^[a-zA-Z]+/[Ss][Cc](-| )[[:digit:]]+/(.+) ]]; then
-  formatted_title="${BASH_REMATCH[1]}"
+  formatted_title="${BASH_REMATCH[2]}"
   echo "Formatted title is '${formatted_title}'"
   if [[ "$formatted_title" != " " && "$formatted_title" != "" ]]; then
-    new_title="${formatted_title}"
+    new_title="$(IFS=- read -ra str <<<"${formatted_title^}"; printf ' %s' "${str[@]}")"
   fi
 fi
 
@@ -96,7 +96,7 @@ if [[ -n $story ]]; then
 
   # Add the story number to the PR title if it isn't already there
   if [[ "$new_title" != *"[sc-$story]"* ]]; then
-    new_title="[sc-${story}] ${new_title^}"
+    new_title="[sc-${story}] ${new_title}"
   fi
 fi
 

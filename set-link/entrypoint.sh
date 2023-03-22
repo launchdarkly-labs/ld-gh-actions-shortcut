@@ -13,9 +13,9 @@ STORY_LINK_TEXT="${STORY_LINK_TEXT:-}"
 COMMENT_ONLY="${COMMENT_ONLY:-}"
 SKIP_LINK="${SKIP_LINK:-}"
 
-echo "Received event:"
-cat "$GITHUB_EVENT_PATH"
-echo
+echo "Received event:" >&2
+cat "$GITHUB_EVENT_PATH" >&2
+echo >&2
 
 number=$(jq -r .number "$GITHUB_EVENT_PATH")
 action=$(jq -r .action "$GITHUB_EVENT_PATH")
@@ -23,11 +23,22 @@ if [[ "$action" != "edited" && "$action" != "opened" && "$action" != "reopened" 
   exit 0
 fi
 
-body="$(jq -r .pull_request.body "$GITHUB_EVENT_PATH")"
-body=${body//$'\r'/} # Remove /r, which confuses jq in ok.sh
-title="$(jq -r .pull_request.title "$GITHUB_EVENT_PATH")"
-title=${title//$'\r'/} # Remove /r, which confuses jq in ok.sh
-branch="$(jq -r .pull_request.head.ref "$GITHUB_EVENT_PATH")"
+get_jq_string() {
+  local jq="$1"
+
+  local str
+  if str="$(jq -e -r "$jq" "$GITHUB_EVENT_PATH")"; then
+    str=${str//$'\r'/} # Remove /r, which confuses jq in ok.sh
+  else
+    str=""
+  fi
+
+  printf "%s" "$str"
+}
+
+body="$(get_jq_string .pull_request.body)"
+title="$(get_jq_string .pull_request.title)"
+branch="$(get_jq_string .pull_request.head.ref)"
 
 echo "Current PR title is '${title}'"
 echo "Github branch is '$branch'"
@@ -70,7 +81,9 @@ if [[ -n "$story" ]]; then
 
   # If we still don't have the url in the body, tack it on the beginning
   if [[ "$new_body" != *"$link_url"* ]]; then
-    new_body="$link_url\n$new_body"
+    body_prefix="$link_url"
+    [[ -n $new_body ]] && body_prefix="$body_prefix\n"
+    new_body="$body_prefix$new_body"
   fi
 fi
 
@@ -102,6 +115,9 @@ if [[ -n $story ]]; then
 fi
 
 echo "Final new title is '${new_title}'"
+echo "Final new body is '${new_body}'"
+
+[[ ${IS_TESTING:-} == "true" ]] && exit 0
 
 SKIP_COMMENT="0"
 "$OK" -j list_issue_comments "$GITHUB_REPOSITORY" "$number" | jq -e '. | map(select(.user?.login? == "shortcut-integration[bot]")) | .[0]' >/dev/null || SKIP_COMMENT="$?"
